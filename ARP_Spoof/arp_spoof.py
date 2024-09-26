@@ -49,7 +49,28 @@ class Spoofer(object):
             sock.bind((self.__arp.interface, htons(0x0800)))
             while True:
                 for packet in self.__arp.packets:
+                    # Send the packet
                     sock.send(packet)
+                    
+                    # Display packet details
+                    eth_header = packet[:14]
+                    arp_header = packet[14:]
+                    
+                    eth_dst = ':'.join(f"{byte:02x}" for byte in eth_header[0:6])
+                    eth_src = ':'.join(f"{byte:02x}" for byte in eth_header[6:12])
+                    
+                    arp_op = int.from_bytes(arp_header[6:8], byteorder='big')
+                    sender_mac = ':'.join(f"{byte:02x}" for byte in arp_header[8:14])
+                    sender_ip = '.'.join(str(byte) for byte in arp_header[14:18])
+                    target_mac = ':'.join(f"{byte:02x}" for byte in arp_header[18:24])
+                    target_ip = '.'.join(str(byte) for byte in arp_header[24:28])
+                    
+                    print(f"[+] Transmitting ARP Packet:")
+                    print(f"    Ethernet Header -> Destination: {eth_dst}, Source: {eth_src}")
+                    print(f"    ARP Operation: {arp_op} (1=Request, 2=Reply)")
+                    print(f"    Sender MAC: {sender_mac}, Sender IP: {sender_ip}")
+                    print(f"    Target MAC: {target_mac}, Target IP: {target_ip}")
+                    
                 time.sleep(self.__interval)
 
 if __name__ == '__main__':
